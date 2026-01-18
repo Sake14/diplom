@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты теста - Процент профессионализма</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+        .results-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        .specialty-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .percentage-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="results-card">
+            <div class="text-center mb-4">
+                <h1><i class="bi bi-trophy"></i> Результаты профориентации</h1>
+            </div>
+
+            <div id="resultsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                    <p class="mt-2">Загрузка результатов...</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary">
+                    <i class="bi bi-house"></i> На главную
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const resultId = urlParams.get('id');
+
+        if (resultId) {
+            loadResults(resultId);
+        } else {
+            showError('ID результата не указан');
+        }
+
+        async function loadResults(id) {
+            try {
+                const response = await fetch(`/api/results/${id}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Ошибка загрузки результатов');
+            }
+        }
+
+        function displayResults(data) {
+            const container = document.getElementById('resultsContent');
+
+            let html = `
+                <div class="mb-4">
+                    <h4><i class="bi bi-person"></i> ${data.name}</h4>
+                    ${data.email ? `<p class="text-muted">${data.email}</p>` : ''}
+                    <p class="text-muted">
+                        <i class="bi bi-calendar"></i>
+                        ${new Date(data.created_at).toLocaleString('ru-RU')}
+                    </p>
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3">Топ-5 рекомендуемых специальностей:</h5>
+            `;
+
+            data.predictions.top_5.forEach(item => {
+                html += `
+                    <div class="specialty-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.rank}. ${item.speciality}</strong>
+                        </div>
+                        <div>
+                            <span class="percentage-badge">${item.percentage.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function showError(message) {
+            document.getElementById('resultsContent').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i> ${message}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

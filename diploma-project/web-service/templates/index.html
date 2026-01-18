@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Процент профессионализма - Профориентация</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px 20px 0 0;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px;
+        }
+        .results-section {
+            padding: 30px;
+        }
+        .specialty-card {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .specialty-card:hover {
+            transform: translateX(5px);
+        }
+        .rank-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .percentage-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .progress {
+            height: 25px;
+            border-radius: 15px;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn-predict {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: transform 0.3s;
+        }
+        .btn-predict:hover {
+            transform: scale(1.05);
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .yandex-form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-card">
+            <!-- Header -->
+            <div class="header-section text-center">
+                <h1 class="display-4 mb-3">
+                    <i class="bi bi-graph-up-arrow"></i> Процент профессионализма
+                </h1>
+                <p class="lead">Определите свои профессиональные предрасположенности</p>
+                <p class="mb-0">Ответьте на 20 вопросов и узнайте, какие специальности подходят вам больше всего</p>
+            </div>
+
+            <!-- Яндекс.Форма -->
+            <div class="form-section">
+                <div class="text-center mb-4">
+                    <h3><i class="bi bi-clipboard-check"></i> Пройдите тест</h3>
+                    <p class="text-muted">Заполните форму ниже, отвечая честно на каждый вопрос</p>
+                </div>
+
+                <div class="yandex-form-container">
+                    <script src="https://forms.yandex.ru/_static/embed.js"></script>
+                    <iframe
+                        src="https://forms.yandex.ru/cloud/696c0bc490fa7b37fb8db36a/?iframe=1"
+                        frameborder="0"
+                        name="ya-form-696c0bc490fa7b37fb8db36a"
+                        width="100%"
+                        height="800"
+                        style="max-width: 650px; margin: 0 auto; display: block;">
+                    </iframe>
+                </div>
+
+                <div class="alert alert-info mt-4" role="alert">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Важно:</strong> После заполнения формы скопируйте свои ответы (1-5) для каждого вопроса и вставьте ниже для получения результатов.
+                </div>
+            </div>
+
+            <!-- Форма для получения результатов -->
+            <div class="results-section">
+                <div class="text-center mb-4">
+                    <h3><i class="bi bi-calculator"></i> Получить результаты</h3>
+                    <p class="text-muted">Введите свои ответы на вопросы (числа от 1 до 5)</p>
+                </div>
+
+                <form id="predictionForm" class="needs-validation" novalidate>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Ваше имя</label>
+                            <input type="text" class="form-control" id="userName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email (необязательно)</label>
+                            <input type="email" class="form-control" id="userEmail">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-4">
+                        <div class="col-12 mb-3">
+                            <strong>Введите ответы на вопросы (1-5):</strong>
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-4" id="answersContainer">
+                            <!-- Поля для ответов будут добавлены через JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-predict">
+                            <i class="bi bi-stars"></i> Узнать результаты
+                        </button>
+                        <div class="loading-spinner mt-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
+                            <p class="mt-2">Анализируем ваши ответы...</p>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Результаты -->
+                <div id="resultsContainer" style="display: none;" class="mt-5">
+                    <div class="text-center mb-4">
+                        <h3><i class="bi bi-trophy"></i> Ваши результаты</h3>
+                        <p class="text-muted">Топ-5 специальностей, которые вам подходят</p>
+                    </div>
+                    <div id="resultsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 text-white">
+            <p>&copy; 2024 Система профориентации. Все права защищены.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Создание полей для 20 ответов
+        const container = document.getElementById('answersContainer');
+        for (let i = 1; i <= 20; i++) {
+            const col = document.createElement('div');
+            col.className = 'col-md-2 col-sm-3 col-4 mb-2';
+            col.innerHTML = `
+                <label class="form-label small">Q${i}</label>
+                <input type="number" class="form-control" id="q${i}" min="1" max="5" required>
+            `;
+            container.appendChild(col);
+        }
+        container.className = 'row g-2';
+
+        // Обработка формы
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const answers = {};
+            for (let i = 1; i <= 20; i++) {
+                answers[`q${i}`] = parseInt(document.getElementById(`q${i}`).value);
+            }
+
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+
+            // Показать загрузку
+            document.querySelector('.loading-spinner').style.display = 'block';
+            document.querySelector('.btn-predict').disabled = true;
+
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        answers: answers
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResults(data.predictions.top_5);
+                } else {
+                    alert('Ошибка: ' + data.error);
+                }
+            } catch (error) {
+                alert('Ошибка соединения с сервером');
+                console.error(error);
+            } finally {
+                document.querySelector('.loading-spinner').style.display = 'none';
+                document.querySelector('.btn-predict').disabled = false;
+            }
+        });
+
+        function displayResults(top5) {
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+
+            top5.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = 'specialty-card';
+                card.innerHTML = `
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="rank-badge">${result.rank}</div>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-2">${result.speciality}</h5>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar"
+                                     style="width: ${result.percentage}%"
+                                     aria-valuenow="${result.percentage}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <span class="percentage-text">${result.percentage.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+                resultsList.appendChild(card);
+            });
+
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+services:
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: ml-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - MODEL_PATH=/app/data/model.pkl
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  web-service:
+    build:
+      context: ./web-service
+      dockerfile: Dockerfile
+    container_name: web-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ml-service
+    environment:
+      - ML_SERVICE_URL=http://ml-service:8000
+      - PORT=8080
+      - DB_PATH=/app/data/results.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+networks:
+  default:
+    name: diploma-network
